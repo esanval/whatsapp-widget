@@ -39,7 +39,6 @@ export default class SaDigitalWhatsApp extends HTMLElement {
     });
 
     const result = await sendWebHook("POST", raw, this.WebHook);
-    console.log(result);
     if (result && result.response[0]?.code === "1002") {
       notifications(status, "WhatsApp enviado correctamente.", "#befade");
     } else {
@@ -140,7 +139,7 @@ export default class SaDigitalWhatsApp extends HTMLElement {
         <img src=${this.logo} class="logo" />
         <div class="field">
           <label for="phone">Número de teléfono</label>
-          <input type="tel" class="phone" placeholder="+34 600 000 000" />
+          <input type="tel" class="phone" placeholder="34600000000" />
         </div>
 
         <div class="preview"></div>
