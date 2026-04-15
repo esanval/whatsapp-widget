@@ -88,6 +88,7 @@ To add the widget to the Webex Contact Center Desktop, edit your **Desktop Layou
             },
             "properties": {
               "token": "$STORE.auth.accessToken",
+              "agentEmail": "$STORE.agent.agentEmailId",
               "logo": "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg",
               "WebHook": "https://hooks.uk.webexconnect.io/events/SQXQPAVAFI"
             }
@@ -114,6 +115,7 @@ To add the widget to the Webex Contact Center Desktop, edit your **Desktop Layou
 |----------|-------------|:---:|
 | `logo` | URL of the logo image displayed inside the widget | ✅ Yes |
 | `token` | Agent access token (auto-injected from the desktop store) | ❌ No |
+| `agentEmail` | Email address of the agent | ❌ No |
 | `WebHook` | Webex Connect webhook URL that receives the template send request | ✅ Yes* |
 | `darkmode` | Dark mode toggle (auto-synced with desktop theme) | ❌ No |
 | `script` | URL pointing to the widget bundle file | ✅ If rehosted |
