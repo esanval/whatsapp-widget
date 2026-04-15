@@ -1,16 +1,16 @@
-# 📲 WhatsApp Widget for Webex Contact Center
+# WhatsApp Widget for Webex Contact Center
 
 A custom widget for **Webex Contact Center Desktop** that allows agents and supervisors to send WhatsApp templates directly from the agent desktop.
 
 ---
 
-## 📋 Description
+## Description
 
 This widget integrates into the Webex Contact Center Desktop Layout and provides a simple UI for agents to send WhatsApp message templates via a configured webhook. It is built as a Web Component using Node.js and bundled into a single JavaScript file served via GitHub Pages.
 
 ---
 
-## 🚀 Features
+## Features
 
 - Send WhatsApp templates from the Webex Contact Center agent/supervisor desktop
 - Dark mode support (synced with the desktop's theme setting)
@@ -19,7 +19,7 @@ This widget integrates into the Webex Contact Center Desktop Layout and provides
 
 ---
 
-## 🛠️ Installation & Build
+## Installation & Build
 
 ### Prerequisites
 
@@ -53,11 +53,11 @@ This widget integrates into the Webex Contact Center Desktop Layout and provides
    src/build/digital-whatsapp-bundle.js
    ```
 
-> ⚠️ **Important:** After any code modification, you must run `npm run build` to regenerate the bundle. The desktop layout must point to the updated bundle file.
+> **Important:** After any code modification, you must run `npm run build` to regenerate the bundle. The desktop layout must point to the updated bundle file.
 
 ---
 
-## ⚙️ Desktop Layout Configuration
+## Desktop Layout Configuration
 
 To add the widget to the Webex Contact Center Desktop, edit your **Desktop Layout JSON** and add the following block inside the `agent` and/or `supervisor` section, under `area > navigation`:
 
@@ -114,7 +114,7 @@ To add the widget to the Webex Contact Center Desktop, edit your **Desktop Layou
 |----------|-------------|:---:|
 | `logo` | URL of the logo image displayed inside the widget | ✅ Yes |
 | `token` | Agent access token (auto-injected from the desktop store) | ❌ No |
-| `WebHook` | Webex Connect webhook URL that receives the template send request | ❌ No* |
+| `WebHook` | Webex Connect webhook URL that receives the template send request | ✅ Yes* |
 | `darkmode` | Dark mode toggle (auto-synced with desktop theme) | ❌ No |
 | `script` | URL pointing to the widget bundle file | ✅ If rehosted |
 
@@ -152,7 +152,7 @@ whatsapp-widget/
 
 ---
 
-## 🌐 Hosting
+## Hosting
 
 The widget bundle is served via **GitHub Pages** at:
 
@@ -164,6 +164,6 @@ Any changes pushed to the repository that affect the bundle file will be automat
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
