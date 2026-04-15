@@ -36,6 +36,7 @@ export default class SaDigitalWhatsApp extends HTMLElement {
 
     const raw = JSON.stringify({
       waid:   phone,
+      email:  this.agentEmail
     });
 
     const result = await sendWebHook("POST", raw, this.WebHook);
