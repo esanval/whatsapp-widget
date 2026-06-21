@@ -115,10 +115,17 @@ To add the widget to the Webex Contact Center Desktop, edit your **Desktop Layou
 
 ## Queue Selection & Webhook Payload
 
-When the widget loads, it calls the Webex CC API to fetch the queues assigned to the logged-in agent:
+When the widget loads, `$STORE.agent.agentId` (passed as the `user-id` property) is actually the agent's **CI user id**, not the id expected by the agent-based-queues API. So the widget first resolves the real agent id:
 
 ```
-GET https://<apiHost>/organization/<org-id>/v2/contact-service-queue/by-user-id/<user-id>/agent-based-queues
+GET https://<apiHost>/organization/<org-id>/v2/user/by-ci-user-id/<user-id>
+Authorization: Bearer <token>
+```
+
+The `id` field of that response is the agent id used to fetch the queues assigned to the logged-in agent:
+
+```
+GET https://<apiHost>/organization/<org-id>/v2/contact-service-queue/by-user-id/<agent-id>/agent-based-queues
 Authorization: Bearer <token>
 ```
 
@@ -146,7 +153,7 @@ The returned queues are shown in a dropdown so the agent can pick which one the 
 | `token` | Agent access token (auto-injected from the desktop store). Also used to authenticate the call to the Webex CC queues API | ❌ No |
 | `agentEmail` | Email address of the agent | ❌ No |
 | `WebHook` | Webex Connect webhook URL that receives the template send request | ✅ Yes* |
-| `user-id` | Agent's user ID (auto-injected from the desktop store), used to look up the agent's queues | ❌ No |
+| `user-id` | Agent's CI user ID (auto-injected from the desktop store), used to resolve the real agent ID before looking up the agent's queues | ❌ No |
 | `org-id` | Webex CC organization ID (auto-injected from the desktop store), used to look up the agent's queues | ❌ No |
 | `apiHost` | Host of the Webex CC API used for the queue lookup. Defaults to `api.wxcc-eu2.cisco.com` | ✅ Yes |
 | `darkmode` | Dark mode toggle (auto-synced with desktop theme) | ❌ No |

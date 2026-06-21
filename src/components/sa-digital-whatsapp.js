@@ -1,6 +1,7 @@
 import { Desktop } from "@wxcc-desktop/sdk";
 import { sendWebHook } from "./webHooks/sendWebHook.js";
 import { getQueues } from "./api/getQueues.js";
+import { getAgentIdByCiUserId } from "./api/getAgentIdByCiUserId.js";
 import { notifications } from "./helpers/notifications.js";
 
 const template = document.createElement("template");
@@ -14,8 +15,9 @@ export default class SaDigitalWhatsApp extends HTMLElement {
   }
 
   connectedCallback() {
-    this.orgId  = this["org-id"];
-    this.userId = this["user-id"];
+    this.orgId    = this["org-id"];
+    // $STORE.agent.agentId actually holds the CI user id, not the agent-based-queues agent id
+    this.ciUserId = this["user-id"];
 
     this.render();
     Desktop.config.init();
@@ -31,7 +33,8 @@ export default class SaDigitalWhatsApp extends HTMLElement {
 
   async _loadQueues() {
     const select = this.shadowRoot.querySelector(".queue");
-    const queues = await getQueues(this.orgId, this.userId, this.token, this.apiHost);
+    const agentId = await getAgentIdByCiUserId(this.orgId, this.ciUserId, this.token, this.apiHost);
+    const queues = agentId ? await getQueues(this.orgId, agentId, this.token, this.apiHost) : [];
 
     select.innerHTML = "";
 
