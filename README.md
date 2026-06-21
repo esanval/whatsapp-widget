@@ -13,6 +13,7 @@ This widget integrates into the Webex Contact Center Desktop Layout and provides
 ## Features
 
 - Send WhatsApp templates from the Webex Contact Center agent/supervisor desktop
+- Queue selector: the widget queries the agent's assigned queues via the Webex CC API and lets the agent pick which one to send in the request
 - Dark mode support (synced with the desktop's theme setting)
 - Configurable logo
 - Token-based authentication using the agent's access token
@@ -90,7 +91,10 @@ To add the widget to the Webex Contact Center Desktop, edit your **Desktop Layou
               "token": "$STORE.auth.accessToken",
               "agentEmail": "$STORE.agent.agentEmailId",
               "logo": "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg",
-              "WebHook": "https://hooks.uk.webexconnect.io/events/SQXQPAVAFI"
+              "WebHook": "https://hooks.uk.webexconnect.io/events/SQXQPAVAFI",
+              "user-id": "$STORE.agent.agentId",
+              "org-id": "$STORE.agent.orgId",
+              "apiHost": "api.wxcc-eu2.cisco.com"
             }
           }
         ]
@@ -109,14 +113,42 @@ To add the widget to the Webex Contact Center Desktop, edit your **Desktop Layou
 
 ---
 
+## Queue Selection & Webhook Payload
+
+When the widget loads, it calls the Webex CC API to fetch the queues assigned to the logged-in agent:
+
+```
+GET https://<apiHost>/organization/<org-id>/v2/contact-service-queue/by-user-id/<user-id>/agent-based-queues
+Authorization: Bearer <token>
+```
+
+`apiHost` defaults to `api.wxcc-eu2.cisco.com` and can be overridden via the `apiHost` property (e.g. to point to another Webex CC region).
+
+The returned queues are shown in a dropdown so the agent can pick which one the request should be routed to. The selected queue's `id` is sent as `queueId` in the webhook request body, along with the existing fields:
+
+```json
+{
+  "waid": "34600000000",
+  "email": "agent@example.com",
+  "queueId": "497d62a2-17b8-4a71-8e40-667b4290b0b1"
+}
+```
+
+> The `org-id` and `user-id` properties must be set in the Desktop Layout (see above) for the queue lookup to work.
+
+---
+
 ## 🔧 Configurable Properties
 
 | Property | Description | Configurable |
 |----------|-------------|:---:|
 | `logo` | URL of the logo image displayed inside the widget | ✅ Yes |
-| `token` | Agent access token (auto-injected from the desktop store) | ❌ No |
+| `token` | Agent access token (auto-injected from the desktop store). Also used to authenticate the call to the Webex CC queues API | ❌ No |
 | `agentEmail` | Email address of the agent | ❌ No |
 | `WebHook` | Webex Connect webhook URL that receives the template send request | ✅ Yes* |
+| `user-id` | Agent's user ID (auto-injected from the desktop store), used to look up the agent's queues | ❌ No |
+| `org-id` | Webex CC organization ID (auto-injected from the desktop store), used to look up the agent's queues | ❌ No |
+| `apiHost` | Host of the Webex CC API used for the queue lookup. Defaults to `api.wxcc-eu2.cisco.com` | ✅ Yes |
 | `darkmode` | Dark mode toggle (auto-synced with desktop theme) | ❌ No |
 | `script` | URL pointing to the widget bundle file | ✅ If rehosted |
 

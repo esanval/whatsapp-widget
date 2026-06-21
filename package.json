@@ -1,7 +1,7 @@
 {
-  "name": "sa-digital-sms",
+  "name": "sa-digital-whatsapp",
   "version": "1.0.0",
-  "description": "Sample widget that helps an agent send info via SMS based on the Webex Connect flow configuration using webhooks.",
+  "description": "Sample widget that helps an agent send info via WhatsApp based on the Webex Connect flow configuration using webhooks.",
   "main": "server.js",
   "scripts": {
     "dev": "nodemon index.js",

@@ -1,5 +1,6 @@
 import { Desktop } from "@wxcc-desktop/sdk";
 import { sendWebHook } from "./webHooks/sendWebHook.js";
+import { getQueues } from "./api/getQueues.js";
 import { notifications } from "./helpers/notifications.js";
 
 const template = document.createElement("template");
@@ -13,9 +14,13 @@ export default class SaDigitalWhatsApp extends HTMLElement {
   }
 
   connectedCallback() {
+    this.orgId  = this["org-id"];
+    this.userId = this["user-id"];
+
     this.render();
     Desktop.config.init();
     this._addEventListeners();
+    this._loadQueues();
   }
 
   _addEventListeners() {
@@ -24,9 +29,31 @@ export default class SaDigitalWhatsApp extends HTMLElement {
     sendBtn.addEventListener("click", () => this._handleSend());
   }
 
+  async _loadQueues() {
+    const select = this.shadowRoot.querySelector(".queue");
+    const queues = await getQueues(this.orgId, this.userId, this.token, this.apiHost);
+
+    select.innerHTML = "";
+
+    if (!queues.length) {
+      const option = document.createElement("option");
+      option.textContent = "No hay colas disponibles";
+      option.disabled = true;
+      select.appendChild(option);
+      return;
+    }
+
+    queues.forEach(queue => {
+      const option = document.createElement("option");
+      option.value = queue.id;
+      option.textContent = queue.name;
+      select.appendChild(option);
+    });
+  }
 
   async _handleSend() {
     const phone    = this.shadowRoot.querySelector(".phone").value.trim();
+    const queueId  = this.shadowRoot.querySelector(".queue").value;
     const status   = this.shadowRoot.querySelectorAll(".status");
 
     if (!phone) {
@@ -34,9 +61,15 @@ export default class SaDigitalWhatsApp extends HTMLElement {
       return;
     }
 
+    if (!queueId) {
+      notifications(status, "Selecciona una cola.", "#fde8e8");
+      return;
+    }
+
     const raw = JSON.stringify({
-      waid:   phone,
-      email:  this.agentEmail
+      waid:    phone,
+      email:   this.agentEmail,
+      queueId: queueId
     });
 
     const result = await sendWebHook("POST", raw, this.WebHook);
@@ -141,6 +174,11 @@ export default class SaDigitalWhatsApp extends HTMLElement {
         <div class="field">
           <label for="phone">Número de teléfono</label>
           <input type="tel" class="phone" placeholder="34600000000" />
+        </div>
+
+        <div class="field">
+          <label for="queue">Cola</label>
+          <select class="queue"></select>
         </div>
 
         <div class="preview"></div>
