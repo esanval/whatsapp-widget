@@ -5,14 +5,10 @@ import { getAgentIdByCiUserId } from "./api/getAgentIdByCiUserId.js";
 import { searchContacts } from "./api/searchContacts.js";
 import { notifications } from "./helpers/notifications.js";
 
-const template = document.createElement("template");
-
-
 export default class SaDigitalWhatsApp extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
-    this.shadowRoot.appendChild(template.content.cloneNode(true));
   }
 
   connectedCallback() {
@@ -188,7 +184,7 @@ export default class SaDigitalWhatsApp extends HTMLElement {
   }
 
   async render() {
-        template.innerHTML = `
+    this.shadowRoot.innerHTML = `
       <style>
         * {
           box-sizing: border-box;
@@ -388,7 +384,6 @@ export default class SaDigitalWhatsApp extends HTMLElement {
       </div>
       </div>
     `;
-    this.shadowRoot.appendChild(template.content.cloneNode(true));
   }
 }
 
