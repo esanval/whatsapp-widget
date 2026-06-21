@@ -207,6 +207,14 @@ export default class SaDigitalWhatsApp extends HTMLElement {
           background: #ffffff;
         }
 
+        .logo {
+          display: block;
+          max-width: 140px;
+          max-height: 60px;
+          object-fit: contain;
+          margin: 0 auto 1.25rem;
+        }
+
         label {
           display: block;
           font-size: 13px;
@@ -287,7 +295,7 @@ export default class SaDigitalWhatsApp extends HTMLElement {
 
         .search-popup {
           position: relative;
-          width: 320px;
+          width: 640px;
           max-height: 70vh;
           overflow-y: auto;
           background: #fff;
