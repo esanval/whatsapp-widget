@@ -151,7 +151,8 @@
                     "WebHook": "<enter you webhook ID>",
                     "user-id": "$STORE.agent.agentId",
                     "org-id": "$STORE.agent.orgId",
-                    "apiHost": "api.wxcc-eu2.cisco.com"
+                    "apiHost": "api.wxcc-eu2.cisco.com",
+                    "searchAPI": "<enter your contact search API URL, e.g. https://your-api.example.com/contacts?q=>"
                   }
                 }
               ]

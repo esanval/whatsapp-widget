@@ -94,7 +94,8 @@ To add the widget to the Webex Contact Center Desktop, edit your **Desktop Layou
               "WebHook": "https://hooks.uk.webexconnect.io/events/SQXQPAVAFI",
               "user-id": "$STORE.agent.agentId",
               "org-id": "$STORE.agent.orgId",
-              "apiHost": "api.wxcc-eu2.cisco.com"
+              "apiHost": "api.wxcc-eu2.cisco.com",
+              "searchAPI": "https://your-api.example.com/contacts?q="
             }
           }
         ]
@@ -145,6 +146,38 @@ The returned queues are shown in a dropdown so the agent can pick which one the 
 
 ---
 
+## Contact Search
+
+If the `searchAPI` property is set in the Desktop Layout, a search field is shown above the phone field. Typing a query and pressing **Enter** issues:
+
+```
+GET <searchAPI><URL-encoded query>
+Authorization: Bearer <token>
+```
+
+The search endpoint is expected to respond with:
+
+```json
+{
+  "data": [
+    {
+      "name": "Jane Doe / ACME CORP, S.L.",
+      "phones": ["600000001"]
+    },
+    {
+      "name": "John Smith / EXAMPLE LTD",
+      "phones": ["600000002", "600000003"]
+    }
+  ]
+}
+```
+
+A popup then lists every result with its phone numbers as clickable links. Clicking a phone number fills the `phone` field with that number and closes the popup. The popup can also be closed by clicking outside it or via its close button. If the request fails or returns no data, a status message is shown instead.
+
+If `searchAPI` is not set, the search field is not rendered.
+
+---
+
 ## 🔧 Configurable Properties
 
 | Property | Description | Configurable |
@@ -156,6 +189,7 @@ The returned queues are shown in a dropdown so the agent can pick which one the 
 | `user-id` | Agent's CI user ID (auto-injected from the desktop store), used to resolve the real agent ID before looking up the agent's queues | ❌ No |
 | `org-id` | Webex CC organization ID (auto-injected from the desktop store), used to look up the agent's queues | ❌ No |
 | `apiHost` | Host of the Webex CC API used for the queue lookup. Defaults to `api.wxcc-eu2.cisco.com` | ✅ Yes |
+| `searchAPI` | Base URL of the contact search API. When set, shows the contact search field. The URL-encoded search text is appended to this string for the GET request. When unset, the search field is hidden | ✅ Yes |
 | `darkmode` | Dark mode toggle (auto-synced with desktop theme) | ❌ No |
 | `script` | URL pointing to the widget bundle file | ✅ If rehosted |
 

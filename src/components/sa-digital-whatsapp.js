@@ -2,6 +2,7 @@ import { Desktop } from "@wxcc-desktop/sdk";
 import { sendWebHook } from "./webHooks/sendWebHook.js";
 import { getQueues } from "./api/getQueues.js";
 import { getAgentIdByCiUserId } from "./api/getAgentIdByCiUserId.js";
+import { searchContacts } from "./api/searchContacts.js";
 import { notifications } from "./helpers/notifications.js";
 
 const template = document.createElement("template");
@@ -27,8 +28,17 @@ export default class SaDigitalWhatsApp extends HTMLElement {
 
   _addEventListeners() {
     const sendBtn = this.shadowRoot.querySelector(".send-btn");
-
     sendBtn.addEventListener("click", () => this._handleSend());
+
+    const searchInput = this.shadowRoot.querySelector(".search");
+    if (searchInput) {
+      searchInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          this._handleSearch(searchInput.value.trim());
+        }
+      });
+    }
   }
 
   async _loadQueues() {
@@ -83,6 +93,100 @@ export default class SaDigitalWhatsApp extends HTMLElement {
     }
   }
 
+  async _handleSearch(query) {
+    const status = this.shadowRoot.querySelectorAll(".status");
+
+    if (!query) {
+      return;
+    }
+
+    const results = await searchContacts(this.searchAPI, query, this.token);
+
+    if (!results) {
+      notifications(status, "No se ha podido completar la búsqueda.", "#fde8e8");
+      return;
+    }
+
+    if (!results.length) {
+      notifications(status, "No se encontraron resultados.", "#fde8e8");
+      return;
+    }
+
+    this._showSearchResults(results);
+  }
+
+  _showSearchResults(results) {
+    this._closeSearchPopup();
+
+    const overlay = document.createElement("div");
+    overlay.className = "search-popup-overlay";
+    overlay.addEventListener("click", event => {
+      if (event.target === overlay) {
+        this._closeSearchPopup();
+      }
+    });
+
+    const popup = document.createElement("div");
+    popup.className = "search-popup";
+
+    const closeBtn = document.createElement("button");
+    closeBtn.type = "button";
+    closeBtn.className = "search-popup-close";
+    closeBtn.textContent = "×";
+    closeBtn.setAttribute("aria-label", "Cerrar");
+    closeBtn.addEventListener("click", () => this._closeSearchPopup());
+    popup.appendChild(closeBtn);
+
+    const list = document.createElement("ul");
+    list.className = "search-result-list";
+
+    results.forEach(item => {
+      const li = document.createElement("li");
+      li.className = "search-result";
+
+      const name = document.createElement("div");
+      name.className = "search-result-name";
+      name.textContent = item.name || "";
+      li.appendChild(name);
+
+      const phones = document.createElement("div");
+      phones.className = "search-result-phones";
+
+      (item.phones || []).forEach(phone => {
+        const link = document.createElement("a");
+        link.href = "#";
+        link.className = "phone-link";
+        link.textContent = phone;
+        link.addEventListener("click", event => {
+          event.preventDefault();
+          this._selectPhone(phone);
+        });
+        phones.appendChild(link);
+      });
+
+      li.appendChild(phones);
+      list.appendChild(li);
+    });
+
+    popup.appendChild(list);
+    overlay.appendChild(popup);
+
+    this.shadowRoot.querySelector(".wrapper").appendChild(overlay);
+    this._searchPopupOverlay = overlay;
+  }
+
+  _closeSearchPopup() {
+    if (this._searchPopupOverlay) {
+      this._searchPopupOverlay.remove();
+      this._searchPopupOverlay = null;
+    }
+  }
+
+  _selectPhone(phone) {
+    this.shadowRoot.querySelector(".phone").value = phone;
+    this._closeSearchPopup();
+  }
+
   async render() {
         template.innerHTML = `
       <style>
@@ -115,6 +219,7 @@ export default class SaDigitalWhatsApp extends HTMLElement {
         }
 
         input[type="tel"],
+        input[type="text"],
         select {
           width: 100%;
           padding: 10px 12px;
@@ -127,6 +232,7 @@ export default class SaDigitalWhatsApp extends HTMLElement {
         }
 
         input[type="tel"]:focus,
+        input[type="text"]:focus,
         select:focus {
           border-color: #009cee;
         }
@@ -169,11 +275,101 @@ export default class SaDigitalWhatsApp extends HTMLElement {
           padding: 8px;
           border-radius: 8px;
         }
+
+        .search-popup-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(0, 0, 0, 0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+        }
+
+        .search-popup {
+          position: relative;
+          width: 320px;
+          max-height: 70vh;
+          overflow-y: auto;
+          background: #fff;
+          border-radius: 10px;
+          padding: 1.25rem;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-popup-close {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          width: 28px;
+          height: 28px;
+          padding: 0;
+          line-height: 1;
+          font-size: 18px;
+          background: transparent;
+          color: #666;
+          border: none;
+          border-radius: 50%;
+          cursor: pointer;
+        }
+
+        .search-popup-close:hover {
+          background: #f0f0f0;
+        }
+
+        .search-result-list {
+          list-style: none;
+          margin: 1.5rem 0 0;
+          padding: 0;
+        }
+
+        .search-result {
+          padding: 10px 0;
+          border-bottom: 1px solid #eee;
+        }
+
+        .search-result:last-child {
+          border-bottom: none;
+        }
+
+        .search-result-name {
+          font-size: 13px;
+          color: #333;
+          margin-bottom: 6px;
+        }
+
+        .search-result-phones {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+
+        .phone-link {
+          font-size: 13px;
+          color: #009cee;
+          text-decoration: none;
+          cursor: pointer;
+        }
+
+        .phone-link:hover {
+          text-decoration: underline;
+        }
       </style>
 
       <div class="wrapper">
       <div class="container">
         <img src=${this.logo} class="logo" />
+
+        ${this.searchAPI ? `
+        <div class="field">
+          <label for="search">Buscar contacto</label>
+          <input type="text" class="search" placeholder="Buscar por nombre, correo, etc..." />
+        </div>
+        ` : ""}
+
         <div class="field">
           <label for="phone">Número de teléfono</label>
           <input type="tel" class="phone" placeholder="34600000000" />
