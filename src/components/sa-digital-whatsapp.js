@@ -27,6 +27,7 @@ export default class SaDigitalWhatsApp extends HTMLElement {
     sendBtn.addEventListener("click", () => this._handleSend());
 
     const searchInput = this.shadowRoot.querySelector(".search");
+    const searchBtn = this.shadowRoot.querySelector(".search-btn");
     if (searchInput) {
       searchInput.addEventListener("keydown", event => {
         if (event.key === "Enter") {
@@ -34,6 +35,9 @@ export default class SaDigitalWhatsApp extends HTMLElement {
           this._handleSearch(searchInput.value.trim());
         }
       });
+    }
+    if (searchBtn) {
+      searchBtn.addEventListener("click", () => this._handleSearch(searchInput.value.trim()));
     }
   }
 
@@ -245,6 +249,23 @@ export default class SaDigitalWhatsApp extends HTMLElement {
           margin-bottom: 1.25rem;
         }
 
+        .search-row {
+          display: flex;
+          gap: 8px;
+        }
+
+        .search-row .search {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .search-btn {
+          width: auto;
+          flex-shrink: 0;
+          padding: 10px 14px;
+          font-size: 14px;
+        }
+
         .preview {
           display: none;
           font-size: 13px;
@@ -370,7 +391,10 @@ export default class SaDigitalWhatsApp extends HTMLElement {
         ${this.searchAPI ? `
         <div class="field">
           <label for="search">Buscar contacto</label>
-          <input type="text" class="search" placeholder="Buscar por nombre, correo, etc..." />
+          <div class="search-row">
+            <input type="text" class="search" placeholder="Buscar por nombre, correo, etc..." />
+            <button type="button" class="search-btn">Buscar</button>
+          </div>
         </div>
         ` : ""}
 
