@@ -90,6 +90,7 @@ To add the widget to the Webex Contact Center Desktop, edit your **Desktop Layou
             "properties": {
               "token": "$STORE.auth.accessToken",
               "agentEmail": "$STORE.agent.agentEmailId",
+              "agentName": "$STORE.agent.agentName",
               "logo": "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg",
               "WebHook": "https://hooks.uk.webexconnect.io/events/SQXQPAVAFI",
               "user-id": "$STORE.agent.agentId",
@@ -138,6 +139,7 @@ The returned queues are shown in a dropdown so the agent can pick which one the 
 {
   "waid": "34600000000",
   "email": "agent@example.com",
+  "agentName": "Jane Doe",
   "queueId": "497d62a2-17b8-4a71-8e40-667b4290b0b1"
 }
 ```
@@ -185,6 +187,7 @@ If `searchAPI` is not set, the search field is not rendered.
 | `logo` | URL of the logo image displayed inside the widget | ✅ Yes |
 | `token` | Agent access token (auto-injected from the desktop store). Also used to authenticate the call to the Webex CC queues API | ❌ No |
 | `agentEmail` | Email address of the agent | ❌ No |
+| `agentName` | Name of the agent (auto-injected from the desktop store). Sent as `agentName` in the webhook payload | ❌ No |
 | `WebHook` | Webex Connect webhook URL that receives the template send request | ✅ Yes* |
 | `user-id` | Agent's CI user ID (auto-injected from the desktop store), used to resolve the real agent ID before looking up the agent's queues | ❌ No |
 | `org-id` | Webex CC organization ID (auto-injected from the desktop store), used to look up the agent's queues | ❌ No |
