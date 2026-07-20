@@ -147,6 +147,7 @@
                   "properties": {
                     "token": "$STORE.auth.accessToken",
                     "agentEmail": "$STORE.agent.agentEmailId",
+                    "agentName": "$STORE.agent.agentName",
                     "logo": "<add your own logo URL>",
                     "WebHook": "<enter you webhook ID>",
                     "user-id": "$STORE.agent.agentId",
